@@ -94,16 +94,36 @@ The values are slightly larger than before. The missing values were treated as z
 ## Are there differences in activity patterns between weekdays and weekends?
 
 Use the dataset with the filled-in missing values for this part.  
+
 1. Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). 
 
-```{r}
+```{r,cache=TRUE}
 for (i in 1:dim(d)[1]) {
     if (is.element(weekdays(as.Date(d$date[i])),c("Saturday","Sunday"))) {
-        d$typeofday <- "weekend"
+        d$typeofday[i] <- "weekend"
     } else {
-        d$typeofday <- "weekday"
+        d$typeofday[i] <- "weekday"
     }
 }
 head(d)
+```
+
+The data frame "d" is split into two, "day" and "end", containing the data for the weekdays and weekends, respectively. 
+
+```{r}
+f <- split(d,d$typeofday)
+day <- f[[1]]
+end <- f[[2]]
+head(day)
+head(end)
+dayave <- tapply(day$steps, day$interval, mean)
+endave <- tapply(end$steps, end$interval, mean)
+head(dayave)
+head(endave)
+```
+```{r,fig.height=8}
+par(mfrow=c(2,1))
+plot(as.numeric(names(dayave)),dayave,type="l", xlab="5 minute interval", ylab="average # of steps", main="weekday")
+plot(as.numeric(names(endave)),endave,type="l", xlab="5 minute interval", ylab="average # of steps", main="weekend")
 ```

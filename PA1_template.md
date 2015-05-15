@@ -196,7 +196,8 @@ The values are slightly larger than before. The missing values were treated as z
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-Use the dataset with the filled-in missing values for this part.
+Use the dataset with the filled-in missing values for this part.  
+
 1. Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). 
 
@@ -204,9 +205,9 @@ Use the dataset with the filled-in missing values for this part.
 ```r
 for (i in 1:dim(d)[1]) {
     if (is.element(weekdays(as.Date(d$date[i])),c("Saturday","Sunday"))) {
-        d$typeofday <- "weekend"
+        d$typeofday[i] <- "weekend"
     } else {
-        d$typeofday <- "weekday"
+        d$typeofday[i] <- "weekday"
     }
 }
 head(d)
@@ -221,3 +222,65 @@ head(d)
 ## 5     0 2012-10-01       20   weekday
 ## 6     2 2012-10-01       25   weekday
 ```
+
+The data frame "d" is split into two, "day" and "end", containing the data for the weekdays and weekends, respectively. 
+
+
+```r
+f <- split(d,d$typeofday)
+day <- f[[1]]
+end <- f[[2]]
+head(day)
+```
+
+```
+##   steps       date interval typeofday
+## 1     2 2012-10-01        0   weekday
+## 2     0 2012-10-01        5   weekday
+## 3     0 2012-10-01       10   weekday
+## 4     0 2012-10-01       15   weekday
+## 5     0 2012-10-01       20   weekday
+## 6     2 2012-10-01       25   weekday
+```
+
+```r
+head(end)
+```
+
+```
+##      steps       date interval typeofday
+## 1441     0 2012-10-06        0   weekend
+## 1442     0 2012-10-06        5   weekend
+## 1443     0 2012-10-06       10   weekend
+## 1444     0 2012-10-06       15   weekend
+## 1445     0 2012-10-06       20   weekend
+## 1446     0 2012-10-06       25   weekend
+```
+
+```r
+dayave <- tapply(day$steps, day$interval, mean)
+endave <- tapply(end$steps, end$interval, mean)
+head(dayave)
+```
+
+```
+##          0          5         10         15         20         25 
+## 2.28888889 0.40000000 0.15555556 0.17777778 0.08888889 1.57777778
+```
+
+```r
+head(endave)
+```
+
+```
+##    0    5   10   15   20   25 
+## 0.25 0.00 0.00 0.00 0.00 3.50
+```
+
+```r
+par(mfrow=c(2,1))
+plot(as.numeric(names(dayave)),dayave,type="l", xlab="5 minute interval", ylab="average # of steps", main="weekday")
+plot(as.numeric(names(endave)),endave,type="l", xlab="5 minute interval", ylab="average # of steps", main="weekend")
+```
+
+![](./PA1_template_files/figure-html/unnamed-chunk-9-1.png) 
