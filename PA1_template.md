@@ -1,17 +1,23 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 ## Loading and preprocessing the data
 
 The first step is to load the data into R. The table is stored in "a".
 
-```{r}
+
+```r
 a <- read.csv("activity.csv")
 head(a)
+```
+
+```
+##   steps       date interval
+## 1    NA 2012-10-01        0
+## 2    NA 2012-10-01        5
+## 3    NA 2012-10-01       10
+## 4    NA 2012-10-01       15
+## 5    NA 2012-10-01       20
+## 6    NA 2012-10-01       25
 ```
 
 ## What is mean total number of steps taken per day?
@@ -24,12 +30,37 @@ The first set of tasks are:
 
 tapply was used to sum the number of steps over each day. The result is stored in "b".
 
-```{r}
+
+```r
 b <- tapply(a$steps, a$date, sum, na.rm=TRUE)
 head(b)
+```
+
+```
+## 2012-10-01 2012-10-02 2012-10-03 2012-10-04 2012-10-05 2012-10-06 
+##          0        126      11352      12116      13294      15420
+```
+
+```r
 hist(b, main="Histogram of total number of steps per day", xlab="Number of steps")
+```
+
+![](./PA1_template_files/figure-html/unnamed-chunk-2-1.png) 
+
+```r
 mean(b)
+```
+
+```
+## [1] 9354.23
+```
+
+```r
 median(b)
+```
+
+```
+## [1] 10395
 ```
 
 The mean number of steps is 9354.23  
@@ -42,11 +73,29 @@ The median number of steps is 10395
 
 tapply was used to average the number of steps over each interval. The result is stored in "c".
 
-```{r}
+
+```r
 c <- tapply(a$steps, a$interval, mean, na.rm=TRUE)
 head(c)
+```
+
+```
+##         0         5        10        15        20        25 
+## 1.7169811 0.3396226 0.1320755 0.1509434 0.0754717 2.0943396
+```
+
+```r
 plot(as.numeric(names(c)),c,type="l", xlab="5 minute interval", ylab="average # of steps", main="Average Daily Activity Pattern")
+```
+
+![](./PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
+```r
 names(c)[which.max(unname(c))]
+```
+
+```
+## [1] "835"
 ```
 
 835 is the 5-minute interval with the maximum average number of steps. 
@@ -58,16 +107,43 @@ names(c)[which.max(unname(c))]
 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
-```{r}
+
+```r
 sum(is.na(a$steps) | is.na(a$date) | is.na(a$interval))
+```
+
+```
+## [1] 2304
+```
+
+```r
 sum(is.na(a$steps))
+```
+
+```
+## [1] 2304
+```
+
+```r
 sum(is.na(a$date))
+```
+
+```
+## [1] 0
+```
+
+```r
 sum(is.na(a$interval))
+```
+
+```
+## [1] 0
 ```
 
 There are 2304 rows with missing values. Note that "steps" is the only column with missing values. I filled in the missing values with the mean for that 5-minute interval, rounded to the nearest integer. The new table is named "d".
 
-```{r}
+
+```r
 d <- a
 for (i in 1:dim(d)[1]) {
     if(is.na(d$steps[i])) {
@@ -77,13 +153,40 @@ for (i in 1:dim(d)[1]) {
 head(d)
 ```
 
+```
+##   steps       date interval
+## 1     2 2012-10-01        0
+## 2     0 2012-10-01        5
+## 3     0 2012-10-01       10
+## 4     0 2012-10-01       15
+## 5     0 2012-10-01       20
+## 6     2 2012-10-01       25
+```
+
 tapply was used again like before. The result is stored in "e".
 
-```{r}
+
+```r
 e <- tapply(d$steps, d$date, sum)
 hist(e, main="Histogram of total number of steps per day", xlab="Number of steps")
+```
+
+![](./PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
+
+```r
 mean(e)
+```
+
+```
+## [1] 10765.64
+```
+
+```r
 median(e)
+```
+
+```
+## [1] 10762
 ```
 
 For the new dataset,  
@@ -93,11 +196,12 @@ The values are slightly larger than before. The missing values were treated as z
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-Use the dataset with the filled-in missing values for this part.  
+Use the dataset with the filled-in missing values for this part.
 1. Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). 
 
-```{r}
+
+```r
 for (i in 1:dim(d)[1]) {
     if (is.element(weekdays(as.Date(d$date[i])),c("Saturday","Sunday"))) {
         d$typeofday <- "weekend"
@@ -106,4 +210,14 @@ for (i in 1:dim(d)[1]) {
     }
 }
 head(d)
+```
+
+```
+##   steps       date interval typeofday
+## 1     2 2012-10-01        0   weekday
+## 2     0 2012-10-01        5   weekday
+## 3     0 2012-10-01       10   weekday
+## 4     0 2012-10-01       15   weekday
+## 5     0 2012-10-01       20   weekday
+## 6     2 2012-10-01       25   weekday
 ```
